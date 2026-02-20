@@ -1,0 +1,25 @@
+{
+  "name": "bexio-cli",
+  "version": "1.0.0",
+  "description": "CLI for bexio ERP, designed for AI tool integration",
+  "main": "dist/index.js",
+  "bin": {
+    "bexio": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts"
+  },
+  "keywords": ["bexio", "cli", "erp"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "bexio": "file:lib/bexio",
+    "commander": "^12.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  }
+}
