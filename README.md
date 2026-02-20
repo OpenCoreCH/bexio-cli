@@ -7,7 +7,7 @@ Built on top of the [bexio TypeScript library](https://github.com/mathewmeconry/
 ## Installation
 
 ```bash
-git clone --recursive https://github.com/your-org/bexio-cli.git
+git clone --recursive https://github.com/OpenCoreCH/bexio-cli.git
 cd bexio-cli
 
 # Build the bexio library
