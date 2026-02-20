@@ -51,7 +51,7 @@ All commands output JSON to stdout. Errors go to stderr as JSON.
   - `bills update-status <id> <DRAFT|BOOKED>` — Change bill status
   - `bills execute-action <id> <DUPLICATE>` — Execute bill action
   - `bills validate-doc-number <number>` — Check document number availability
-- `outgoing-payments list|show|create` — Outgoing payments
+- `outgoing-payments list|show|create` — Outgoing payments (list requires `--bill-id`)
   - `outgoing-payments cancel <id>` — Cancel a payment
   - `outgoing-payments update <json>` — Update a payment
 
