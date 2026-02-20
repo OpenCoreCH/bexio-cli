@@ -27,7 +27,7 @@ npm link
 ### Requirements
 
 - Node.js >= 18.14.0
-- A bexio API token ([generate one here](https://office.bexio.com/index.php/admin/apiTokens))
+- A bexio API token ([generate one here](https://developer.bexio.com))
 
 ## Authentication
 
