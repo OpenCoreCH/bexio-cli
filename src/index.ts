@@ -212,6 +212,7 @@ registerResource(program, {
   name: "bills",
   description: "Manage bills (v4 API)",
   resourceKey: "billsV4",
+  stringIds: true,
   operations: {
     list: true,
     show: true,
@@ -273,6 +274,13 @@ registerResource(program, {
   name: "outgoing-payments",
   description: "Manage outgoing payments",
   resourceKey: "outgoingPayments",
+  stringIds: true,
+  extraListOptions: [
+    {
+      flags: "--bill-id <id>",
+      description: "Filter by bill ID (required)",
+    },
+  ],
   operations: {
     list: true,
     show: true,
