@@ -7,7 +7,7 @@ A command-line interface for the bexio ERP system. All output is JSON, designed 
 ```bash
 cd <project-root>
 git submodule update --init --recursive
-cd lib/bexio && npm install && npm run build && cd ../..
+cd lib/bexio && corepack enable && yarn install --immutable && yarn build && cd ../..
 npm install && npm run build
 ```
 

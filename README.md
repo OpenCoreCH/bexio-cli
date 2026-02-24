@@ -11,7 +11,7 @@ git clone --recursive https://github.com/OpenCoreCH/bexio-cli.git
 cd bexio-cli
 
 # Build the bexio library
-cd lib/bexio && npm install && npm run build && cd ../..
+cd lib/bexio && corepack enable && yarn install --immutable && yarn build && cd ../..
 
 # Build the CLI
 npm install
