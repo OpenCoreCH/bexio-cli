@@ -213,6 +213,10 @@ registerResource(program, {
   description: "Manage bills (v4 API)",
   resourceKey: "billsV4",
   stringIds: true,
+  sortConfig: {
+    fieldParam: "sort",
+    directionParam: "order",
+  },
   operations: {
     list: true,
     show: true,
@@ -275,6 +279,10 @@ registerResource(program, {
   description: "Manage outgoing payments",
   resourceKey: "outgoingPayments",
   stringIds: true,
+  sortConfig: {
+    fieldParam: "sort",
+    directionParam: "order",
+  },
   extraListOptions: [
     {
       flags: "--bill-id <id>",

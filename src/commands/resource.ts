@@ -8,11 +8,19 @@ interface ListOption {
   parser?: (value: string) => unknown;
 }
 
+type SortDirection = "asc" | "desc";
+
+interface SortConfig {
+  fieldParam: string;
+  directionParam?: string;
+}
+
 interface ResourceConfig {
   name: string;
   description: string;
   resourceKey: string;
   stringIds?: boolean;
+  sortConfig?: SortConfig;
   extraListOptions?: ListOption[];
   operations: {
     list?: boolean;
@@ -41,6 +49,67 @@ function parseJson(value: string): unknown {
   }
 }
 
+function parseSortDirection(value: string): SortDirection {
+  const normalized = value.toLowerCase();
+  if (normalized !== "asc" && normalized !== "desc") {
+    outputError("Sort direction must be 'asc' or 'desc'", {
+      input: value,
+    });
+  }
+  return normalized;
+}
+
+function parseOrderBy(value: string): { field: string; direction?: SortDirection } {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    outputError("Order field cannot be empty");
+  }
+  const match = trimmed.match(/^(.*)_(asc|desc)$/i);
+  if (match && match[1]) {
+    return {
+      field: match[1],
+      direction: match[2].toLowerCase() as SortDirection,
+    };
+  }
+  return { field: trimmed };
+}
+
+function applySortOptions(
+  options: Record<string, unknown>,
+  orderBy: string | undefined,
+  orderDirection: SortDirection | undefined,
+  sortConfig: SortConfig
+): void {
+  if (!orderBy) {
+    if (orderDirection) {
+      outputError("Cannot set --order-direction without --order-by", {
+        hint: "Use --order-by <field> with --order-direction <asc|desc>",
+      });
+    }
+    return;
+  }
+
+  const parsedOrderBy = parseOrderBy(orderBy);
+  if (
+    parsedOrderBy.direction &&
+    orderDirection &&
+    parsedOrderBy.direction !== orderDirection
+  ) {
+    outputError("Conflicting sort direction provided", {
+      orderBy,
+      orderDirection,
+    });
+  }
+
+  const resolvedDirection = orderDirection ?? parsedOrderBy.direction;
+  options[sortConfig.fieldParam] = parsedOrderBy.field;
+  if (sortConfig.directionParam && resolvedDirection) {
+    options[sortConfig.directionParam] = resolvedDirection;
+  } else if (!sortConfig.directionParam && resolvedDirection) {
+    options[sortConfig.fieldParam] = `${parsedOrderBy.field}_${resolvedDirection}`;
+  }
+}
+
 function parseSearchParams(
   value: string
 ): Array<{ field: string; value: unknown; criteria?: string }> {
@@ -60,6 +129,7 @@ export function registerResource(
   program: Command,
   config: ResourceConfig
 ): void {
+  const sortConfig = config.sortConfig ?? { fieldParam: "order_by" };
   const cmd = program
     .command(config.name)
     .description(config.description);
@@ -73,7 +143,12 @@ export function registerResource(
       .description(`List all ${config.name}`)
       .option("--limit <n>", "Max results to return", parseInt)
       .option("--offset <n>", "Number of results to skip", parseInt)
-      .option("--order-by <field>", "Field to order by");
+      .option("--order-by <field>", "Field to order by")
+      .option(
+        "--order-direction <direction>",
+        "Sort direction (asc|desc)",
+        parseSortDirection
+      );
 
     if (config.extraListOptions) {
       for (const opt of config.extraListOptions) {
@@ -87,12 +162,15 @@ export function registerResource(
 
     listCmd.action(async (opts) => {
       try {
-        const client = getClient();
-        const resource = (client as any)[config.resourceKey];
         const options: Record<string, unknown> = {};
         if (opts.limit !== undefined) options.limit = opts.limit;
         if (opts.offset !== undefined) options.offset = opts.offset;
-        if (opts.orderBy) options.order_by = opts.orderBy;
+        applySortOptions(
+          options,
+          opts.orderBy,
+          opts.orderDirection,
+          sortConfig
+        );
         if (config.extraListOptions) {
           for (const opt of config.extraListOptions) {
             const match = opt.flags.match(/--([a-z-]+)/);
@@ -107,6 +185,8 @@ export function registerResource(
             }
           }
         }
+        const client = getClient();
+        const resource = (client as any)[config.resourceKey];
         const result = await resource.list(
           Object.keys(options).length > 0 ? options : undefined
         );
@@ -142,15 +222,25 @@ export function registerResource(
       .option("--limit <n>", "Max results", parseInt)
       .option("--offset <n>", "Skip results", parseInt)
       .option("--order-by <field>", "Order by field")
+      .option(
+        "--order-direction <direction>",
+        "Sort direction (asc|desc)",
+        parseSortDirection
+      )
       .action(async (params: string, opts) => {
         try {
-          const client = getClient();
-          const resource = (client as any)[config.resourceKey];
           const searchParams = parseSearchParams(params);
           const options: Record<string, unknown> = {};
           if (opts.limit !== undefined) options.limit = opts.limit;
           if (opts.offset !== undefined) options.offset = opts.offset;
-          if (opts.orderBy) options.order_by = opts.orderBy;
+          applySortOptions(
+            options,
+            opts.orderBy,
+            opts.orderDirection,
+            sortConfig
+          );
+          const client = getClient();
+          const resource = (client as any)[config.resourceKey];
           const result = await resource.search(
             searchParams,
             Object.keys(options).length > 0 ? options : undefined

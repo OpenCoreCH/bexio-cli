@@ -89,6 +89,9 @@ Most `list` commands support:
 - `--limit <n>` — Max number of results
 - `--offset <n>` — Skip first n results
 - `--order-by <field>` — Sort field
+- `--order-direction <asc|desc>` — Sort direction (default: `asc`)
+
+You can also append `_asc` or `_desc` directly to the `--order-by` field.
 
 Most `search` commands accept a JSON array:
 ```bash

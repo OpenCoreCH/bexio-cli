@@ -77,6 +77,9 @@ bexio contacts delete 42
 # List invoices with pagination
 bexio invoices list --limit 10 --offset 20 --order-by title
 
+# List invoices sorted descending
+bexio invoices list --order-by title --order-direction desc
+
 # Send an invoice
 bexio invoices send 15
 
@@ -153,6 +156,9 @@ Most `list` commands support:
 | `--limit <n>` | Maximum number of results to return |
 | `--offset <n>` | Number of results to skip |
 | `--order-by <field>` | Field to sort by |
+| `--order-direction <asc\|desc>` | Sort direction (defaults to ascending) |
+
+You can also append `_asc` or `_desc` directly to `--order-by`, e.g. `--order-by title_desc`.
 
 ## Search
 
