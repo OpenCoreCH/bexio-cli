@@ -3,3 +3,5 @@ dist/
 *.js.map
 .env
 .claude/
+AGENTS.local.md
+opencode.json

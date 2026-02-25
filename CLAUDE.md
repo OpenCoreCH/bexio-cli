@@ -108,6 +108,12 @@ bexio contacts create '{"name_1":"Acme Corp","contact_type_id":1,"owner_id":1,"u
 bexio contacts edit 42 '{"name_1":"Acme Corporation"}'
 ```
 
+### Invoice `document_nr`
+
+The `document_nr` field on invoices depends on the bexio frontend setting "automatic numbering" (see https://help.bexio.com/s/article/000001784):
+- **Automatic numbering enabled**: `document_nr` cannot be provided; bexio assigns it automatically.
+- **Automatic numbering disabled**: `document_nr` is required. You must determine the next number by inspecting existing invoices (e.g. search by `contact_id`, find the latest `document_nr`, and increment it).
+
 ## Error Handling
 
 Errors are written to stderr as JSON: `{"error":"message","details":{...}}`
